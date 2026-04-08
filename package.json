@@ -47,9 +47,10 @@
 		"url": "https://github.com/nathanvsn/n8n-nodes-structura.git"
 	},
 	"scripts": {
-		"build": "tsc && gulp build:icons",
-		"dev": "tsc --watch",
-		"lint": "eslint . --ext .ts",
+		"build": "n8n-node build",
+		"dev": "n8n-node dev",
+		"lint": "n8n-node lint",
+		"release": "n8n-node release",
 		"prepublishOnly": "npm run build"
 	},
 	"files": [
@@ -65,7 +66,11 @@
 		]
 	},
 	"devDependencies": {
+		"@n8n/node-cli": "^0.23.1",
 		"@types/node": "^25.5.2",
+		"@typescript-eslint/eslint-plugin": "^8.58.1",
+		"@typescript-eslint/parser": "^8.58.1",
+		"eslint": "^9.39.4",
 		"gulp": "^5.0.0",
 		"n8n-workflow": "*",
 		"typescript": "~5.7.0"

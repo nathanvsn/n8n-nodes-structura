@@ -7,13 +7,13 @@ import type {
 	IHttpRequestOptions,
 	IDataObject,
 } from 'n8n-workflow';
-import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError, sleep } from 'n8n-workflow';
 
 export class Structura implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Structura',
 		name: 'structura',
-		icon: 'file:structura.png',
+		icon: 'file:structura.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
@@ -38,34 +38,34 @@ export class Structura implements INodeType {
 				default: 'extractDocument',
 				options: [
 					{
+						name: 'Download Result',
+						value: 'downloadResult',
+						description: 'Download the extracted result as JSON, Markdown, Text, or Spreadsheet file',
+						action: 'Download extraction result',
+					},
+					{
 						name: 'Extract Document',
 						value: 'extractDocument',
 						description: 'Upload a PDF, invoice, receipt or image and extract structured data (JSON, Excel, Markdown) using AI',
 						action: 'Extract structured data from a document',
 					},
 					{
+						name: 'Get Credits',
+						value: 'getCredits',
+						description: 'Check your remaining API credit balance and usage',
+						action: 'Get credit balance',
+					},
+					{
 						name: 'Get Document',
 						value: 'getDocument',
-						description: 'Get document status and extraction result',
+						description: 'Get document processing status and extraction result by ID',
 						action: 'Get document status and result',
 					},
 					{
 						name: 'List Documents',
 						value: 'listDocuments',
-						description: 'List all processed documents',
+						description: 'List all processed documents with status and date filters',
 						action: 'List all documents',
-					},
-					{
-						name: 'Download Result',
-						value: 'downloadResult',
-						description: 'Download the extracted result as a file',
-						action: 'Download extraction result',
-					},
-					{
-						name: 'Get Credits',
-						value: 'getCredits',
-						description: 'Check your current credit balance',
-						action: 'Get credit balance',
 					},
 				],
 			},
@@ -142,7 +142,7 @@ export class Structura implements INodeType {
 				displayOptions: { show: { operation: ['extractDocument'] } },
 			},
 			{
-				displayName: 'Max Wait Time (seconds)',
+				displayName: 'Max Wait Time (Seconds)',
 				name: 'maxWaitTime',
 				type: 'number',
 				default: 120,
@@ -166,8 +166,11 @@ export class Structura implements INodeType {
 				displayName: 'Limit',
 				name: 'limit',
 				type: 'number',
-				default: 20,
-				description: 'Max number of results to return (1-100)',
+				typeOptions: {
+					minValue: 1,
+				},
+				default: 50,
+				description: 'Max number of results to return',
 				displayOptions: { show: { operation: ['listDocuments'] } },
 			},
 			{
@@ -186,9 +189,9 @@ export class Structura implements INodeType {
 						options: [
 							{ name: 'All', value: '' },
 							{ name: 'Completed', value: 'COMPLETED' },
-							{ name: 'Processing', value: 'PROCESSING' },
 							{ name: 'Failed', value: 'FAILED' },
 							{ name: 'Pending', value: 'PENDING' },
+							{ name: 'Processing', value: 'PROCESSING' },
 						],
 					},
 					{
@@ -297,40 +300,45 @@ async function extractDocument(this: IExecuteFunctions, i: number): Promise<IDat
 
 	const credentials = await this.getCredentials('structuraApi');
 	const baseUrl = credentials.baseUrl as string;
-	const apiKey = credentials.apiKey as string;
 
-	// Build multipart form data using the legacy request helper (reliable for file uploads)
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const formData: any = {
-		file: {
+	// Build multipart form data for file upload
+	/* eslint-disable n8n-nodes-base/node-param-display-name-miscased */
+	const multipartData: IDataObject[] = [
+		{
+			name: 'file',
 			value: buffer,
 			options: {
 				filename: fileName,
 				contentType: mimeType,
 			},
 		},
-		output_format: outputFormat,
-		processing_mode: processingMode,
-	};
+		{ name: 'output_format', value: outputFormat },
+		{ name: 'processing_mode', value: processingMode },
+	];
+	/* eslint-enable n8n-nodes-base/node-param-display-name-miscased */
 
 	if (outputFormat === 'JSON' || outputFormat === 'SPREADSHEET') {
 		const extractionSchema = this.getNodeParameter('extractionSchema', i) as string;
-		formData['extraction_schema'] = extractionSchema;
+		multipartData.push({ name: 'extraction_schema', value: extractionSchema });
 	}
 
 	if (pageRange) {
-		formData['page_range'] = pageRange;
+		multipartData.push({ name: 'page_range', value: pageRange });
 	}
 
-	const uploadResponse = await this.helpers.request({
-		method: 'POST',
-		uri: `${baseUrl}/api/v1/upload/`,
-		formData,
-		headers: {
-			'X-API-Key': apiKey,
+	const uploadResponse = await this.helpers.httpRequestWithAuthentication.call(
+		this,
+		'structuraApi',
+		{
+			method: 'POST',
+			url: `${baseUrl}/api/v1/upload/`,
+			body: multipartData,
+			headers: {
+				'Content-Type': 'multipart/form-data',
+			},
+			json: true,
 		},
-		json: true,
-	}) as IDataObject;
+	) as IDataObject;
 
 	if (!waitForCompletion) {
 		return uploadResponse;
@@ -374,7 +382,7 @@ async function extractDocument(this: IExecuteFunctions, i: number): Promise<IDat
 		}
 
 		// Wait before next poll
-		await new Promise((resolve) => setTimeout(resolve, pollInterval));
+		await sleep(pollInterval);
 	}
 
 	throw new NodeOperationError(

@@ -9,6 +9,7 @@ export class StructuraApi implements ICredentialType {
 	name = 'structuraApi';
 	displayName = 'Structura API';
 	documentationUrl = 'https://structura.com.br/docs';
+	icon = { light: 'file:../nodes/Structura/structura.svg', dark: 'file:../nodes/Structura/structura.svg' } as const;
 	properties: INodeProperties[] = [
 		{
 			displayName: 'API Key',
