@@ -1,6 +1,6 @@
 {
 	"name": "n8n-nodes-structura",
-	"version": "0.2.1",
+	"version": "0.2.2",
 	"description": "n8n community node for Structura — Transform documents (PDF, images) into structured JSON, Excel, Markdown using AI with 99.8% accuracy.",
 	"license": "MIT",
 	"homepage": "https://structura.com.br",
