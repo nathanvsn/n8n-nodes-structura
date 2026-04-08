@@ -1,0 +1,76 @@
+{
+	"name": "n8n-nodes-structura",
+	"version": "0.2.0",
+	"description": "n8n community node for Structura — Transform documents (PDF, images) into structured JSON, Excel, Markdown using AI with 99.8% accuracy.",
+	"license": "MIT",
+	"homepage": "https://structura.com.br",
+	"keywords": [
+		"n8n-community-node-package",
+		"n8n",
+		"n8n-node",
+		"n8n-nodes",
+		"pdf",
+		"ocr",
+		"document-parsing",
+		"document-processing",
+		"document-extraction",
+		"document-ai",
+		"pdf-to-json",
+		"pdf-to-excel",
+		"pdf-to-text",
+		"pdf-to-markdown",
+		"pdf-parser",
+		"invoice-extraction",
+		"receipt-extraction",
+		"table-extraction",
+		"data-extraction",
+		"structured-data",
+		"json-schema",
+		"ai-extraction",
+		"image-to-text",
+		"image-to-json",
+		"parse-document",
+		"parse-invoice",
+		"parse-receipt",
+		"document-automation",
+		"intelligent-document-processing",
+		"idp",
+		"structura"
+	],
+	"author": {
+		"name": "Structura",
+		"email": "contato@structura.com.br",
+		"url": "https://structura.com.br"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/nathanvsn/n8n-nodes-structura.git"
+	},
+	"scripts": {
+		"build": "tsc && gulp build:icons",
+		"dev": "tsc --watch",
+		"lint": "eslint . --ext .ts",
+		"prepublishOnly": "npm run build"
+	},
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"credentials": [
+			"dist/credentials/StructuraApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/Structura/Structura.node.js"
+		]
+	},
+	"devDependencies": {
+		"@types/node": "^25.5.2",
+		"gulp": "^5.0.0",
+		"n8n-workflow": "*",
+		"typescript": "~5.7.0"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	}
+}

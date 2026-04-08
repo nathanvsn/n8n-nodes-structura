@@ -1,0 +1,55 @@
+{
+	"node": "n8n-nodes-structura.structura",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["AI", "Productivity", "Data & Storage"],
+	"subcategories": {
+		"AI": ["Document Loaders", "Tools"]
+	},
+	"resources": {
+		"primaryDocumentation": [
+			{
+				"url": "https://structura.com.br/docs"
+			}
+		],
+		"credentialDocumentation": [
+			{
+				"url": "https://structura.com.br/docs"
+			}
+		]
+	},
+	"alias": [
+		"document",
+		"pdf",
+		"ocr",
+		"json",
+		"extract",
+		"invoice",
+		"receipt",
+		"nota fiscal",
+		"boleto",
+		"parse",
+		"structura",
+		"pdf to json",
+		"pdf to excel",
+		"pdf to text",
+		"pdf to markdown",
+		"document parser",
+		"document extraction",
+		"document processing",
+		"image to text",
+		"image to json",
+		"table extraction",
+		"data extraction",
+		"structured data",
+		"json schema",
+		"bank statement",
+		"extrato bancario",
+		"contract",
+		"contrato",
+		"spreadsheet",
+		"ai extraction",
+		"intelligent document processing",
+		"IDP"
+	]
+}
